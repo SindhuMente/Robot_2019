@@ -8,7 +8,9 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -17,6 +19,12 @@ import edu.wpi.first.cameraserver.CameraServer;
 import frc.robot.drive_system.DriveSystem;
 import frc.robot.drive_system.DriveSystemInput;
 import frc.robot.drive_system.DriveSystemOutput;
+import frc.robot.elevator_system.ElevatorSystem;
+import frc.robot.elevator_system.ElevatorSystemInput;
+import frc.robot.elevator_system.ElevatorSystemOutput;
+import frc.robot.grabber_system.GrabberSystem;
+import frc.robot.grabber_system.GrabberSystemInput;
+import frc.robot.grabber_system.GrabberSystemOutput;
 
 /**
  * This is a demo program showing the use of the RobotDrive class, specifically
@@ -24,17 +32,31 @@ import frc.robot.drive_system.DriveSystemOutput;
  */
 public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
+  private PWMTalonSRX m_mainWinch;
+  private PWMTalonSRX m_backWinch;
+  private PWMVictorSPX m_intake;
+  private Spark m_claw;
   private Joystick m_leftStick;
   private Joystick m_rightStick;
+  private Joystick m_controller;
   private SpeedScaler m_speedScaler;
   private DriveSystem m_driveSystem;
+  private ElevatorSystem m_elevatorSystem;
+  private GrabberSystem m_grabberSystem;
 
   @Override
   public void robotInit() {
     m_myRobot = new DifferentialDrive(new PWMVictorSPX(Config.LEFT_PWM_PORT), new PWMVictorSPX(Config.RIGHT_PWM_PORT));
+    m_mainWinch = new PWMTalonSRX(Config.MAIN_WINCH_PORT);
+    m_backWinch = new PWMTalonSRX(Config.BACK_WINCH_PORT);
     m_leftStick = new Joystick(Config.LEFT_JOYSTICK_PORT);
     m_rightStick = new Joystick(Config.RIGHT_JOYSTICK_PORT);
+    m_controller = new Joystick(Config.CONTROLLER_JOYSTICK_PORT);
     m_speedScaler = new SpeedScaler(Config.SLOW_SPEED, Config.NORMAL_SPEED, Config.TURBO_SPEED);
+    m_driveSystem = new DriveSystem(m_speedScaler);
+    m_elevatorSystem = new ElevatorSystem(Config.MAIN_WENCH_SCALE, Config.BACK_WENCH_SCALE);
+    m_grabberSystem = new GrabberSystem(Config.INTAKE_SCALE, Config.CLAW_SCALE);
+
     CameraServer.getInstance().startAutomaticCapture();
   }
 
@@ -43,6 +65,8 @@ public class Robot extends TimedRobot {
 
 
     writeDriveSystemOutput(m_driveSystem.process(readDriveSystemInput()));
+    writeElevatorSystemOutput(m_elevatorSystem.process(readElevatorSystemInput()));
+    writeGrabberSystemOutput(m_grabberSystem.process(readGrabberSystemInput()));
 
   }
   public DriveSystemInput readDriveSystemInput() {
@@ -56,5 +80,24 @@ public class Robot extends TimedRobot {
   }
   public void writeDriveSystemOutput(DriveSystemOutput output) {
     m_myRobot.tankDrive(output.leftPower, output.rightPower);
+  }
+  public ElevatorSystemInput readElevatorSystemInput() {
+    double mainWinchPower = m_controller.getRawAxis(Config.MAIN_WENCH_AXIS_ID);
+    boolean backWinchUp = m_controller.getRawButton(Config.BACK_WENCH_UP_BUTTON_ID);
+    boolean backWinchDown = m_controller.getRawButton(Config.BACK_WENCH_DOWN_BUTTON_ID);
+    return new ElevatorSystemInput(mainWinchPower, backWinchUp, backWinchDown);
+  }
+  public void writeElevatorSystemOutput(ElevatorSystemOutput output) {
+    m_mainWinch.set(output.mainPower);
+    m_backWinch.set(output.backPower);
+  }
+  public GrabberSystemInput readGrabberSystemInput () {
+    double intakePower = m_controller.getRawAxis(Config.INTAKE_AXIS_ID);
+    boolean clawOpen = m_controller.getRawButton(Config.CLAW_BUTTON_ID);
+    return new GrabberSystemInput(clawOpen, intakePower);
+  }
+  public void writeGrabberSystemOutput (GrabberSystemOutput output) {
+    m_intake.set(output.intakePower);
+    m_claw.set(output.clawPower);
   }
 }
