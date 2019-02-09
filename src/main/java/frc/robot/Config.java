@@ -4,10 +4,12 @@ public class Config {
     public static final int LEFT_JOYSTICK_PORT = 0;
     public static final int RIGHT_JOYSTICK_PORT = 1;
     public static final int CONTROLLER_JOYSTICK_PORT = 2;
-    public static final int LEFT_PWM_PORT = 0;
-    public static final int RIGHT_PWM_PORT = 1;
-    public static final int MAIN_WINCH_PORT = 2;
-    public static final int BACK_WINCH_PORT = 3;
+    public static final int FRONT_LEFT_PWM_PORT = 0;
+    public static final int FRONT_RIGHT_PWM_PORT = 1;
+    public static final int BACK_LEFT_PWM_PORT = 2;
+    public static final int BACK_RIGHT_PWM_PORT = 3;
+    public static final int MAIN_WINCH_PORT = 4;
+    public static final int BACK_WINCH_PORT = 5;
     public static final double SLOW_SPEED = 0.25;
     public static final double NORMAL_SPEED = 0.5;
     public static final double TURBO_SPEED = 1;

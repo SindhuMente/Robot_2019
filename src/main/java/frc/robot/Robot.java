@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
 import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -31,6 +32,12 @@ import frc.robot.grabber_system.GrabberSystemOutput;
  * it contains the code necessary to operate a robot with tank drive.
  */
 public class Robot extends TimedRobot {
+  private SpeedControllerGroup m_leftDrive;
+  private SpeedControllerGroup m_rightDrive;
+  private PWMVictorSPX m_frontLeftDrive;
+  private PWMVictorSPX m_frontRightDrive;
+  private PWMVictorSPX m_backLeftDrive;
+  private PWMVictorSPX m_backRightDrive;
   private DifferentialDrive m_myRobot;
   private PWMTalonSRX m_mainWinch;
   private PWMTalonSRX m_backWinch;
@@ -46,7 +53,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    m_myRobot = new DifferentialDrive(new PWMVictorSPX(Config.LEFT_PWM_PORT), new PWMVictorSPX(Config.RIGHT_PWM_PORT));
+    m_frontLeftDrive = new PWMVictorSPX(Config.FRONT_LEFT_PWM_PORT);
+    m_frontRightDrive = new PWMVictorSPX(Config.FRONT_RIGHT_PWM_PORT);
+    m_backLeftDrive = new PWMVictorSPX(Config.BACK_LEFT_PWM_PORT);
+    m_backRightDrive = new PWMVictorSPX(Config.BACK_RIGHT_PWM_PORT);
+    m_leftDrive = new SpeedControllerGroup(m_frontLeftDrive, m_backLeftDrive);
+    m_rightDrive = new SpeedControllerGroup(m_frontRightDrive, m_backRightDrive);
+    m_myRobot = new DifferentialDrive(m_leftDrive, m_rightDrive);
     m_mainWinch = new PWMTalonSRX(Config.MAIN_WINCH_PORT);
     m_backWinch = new PWMTalonSRX(Config.BACK_WINCH_PORT);
     m_leftStick = new Joystick(Config.LEFT_JOYSTICK_PORT);
