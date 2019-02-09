@@ -61,6 +61,7 @@ public class Robot extends TimedRobot {
     m_rightDrive = new SpeedControllerGroup(m_frontRightDrive, m_backRightDrive);
     m_myRobot = new DifferentialDrive(m_leftDrive, m_rightDrive);
     m_mainWinch = new PWMTalonSRX(Config.MAIN_WINCH_PORT);
+    m_claw = new Spark(Config.CLAW_PWM_PORT);
     m_backWinch = new PWMTalonSRX(Config.BACK_WINCH_PORT);
     m_leftStick = new Joystick(Config.LEFT_JOYSTICK_PORT);
     m_rightStick = new Joystick(Config.RIGHT_JOYSTICK_PORT);
@@ -69,6 +70,14 @@ public class Robot extends TimedRobot {
     m_driveSystem = new DriveSystem(m_speedScaler);
     m_elevatorSystem = new ElevatorSystem(Config.MAIN_WENCH_SCALE, Config.BACK_WENCH_SCALE);
     m_grabberSystem = new GrabberSystem(Config.INTAKE_SCALE, Config.CLAW_SCALE);
+
+    m_frontLeftDrive.setInverted(Config.INVERT_FRONT_LEFT);
+    m_frontRightDrive.setInverted(Config.INVERT_FRONT_RIGHT);
+    m_backLeftDrive.setInverted(Config.INVERT_BACK_LEFT);
+    m_backRightDrive.setInverted(Config.INVERT_BACK_RIGHT);
+    m_mainWinch.setInverted(Config.INVERT_MAIN_WINCH);
+    m_claw.setInverted(Config.INVERT_CLAW);
+    m_backWinch.setInverted(Config.INVERT_BACK_WINCH);
 
     CameraServer.getInstance().startAutomaticCapture();
   }
