@@ -14,6 +14,10 @@ import edu.wpi.first.wpilibj.Joystick.ButtonType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.cameraserver.CameraServer;
 
+import frc.robot.drive_system.DriveSystem;
+import frc.robot.drive_system.DriveSystemInput;
+import frc.robot.drive_system.DriveSystemOutput;
+
 /**
  * This is a demo program showing the use of the RobotDrive class, specifically
  * it contains the code necessary to operate a robot with tank drive.
@@ -23,6 +27,7 @@ public class Robot extends TimedRobot {
   private Joystick m_leftStick;
   private Joystick m_rightStick;
   private SpeedScaler m_speedScaler;
+  private DriveSystem m_driveSystem;
 
   @Override
   public void robotInit() {
@@ -35,15 +40,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+
+
+    writeDriveSystemOutput(m_driveSystem.process(readDriveSystemInput()));
+
+  }
+  public DriveSystemInput readDriveSystemInput() {
     boolean leftTrigger = m_leftStick.getButton(ButtonType.kTrigger);
     boolean rightTrigger = m_rightStick.getButton(ButtonType.kTrigger);
     boolean leftTop = m_leftStick.getButton(ButtonType.kTop);
     boolean rightTop = m_rightStick.getButton(ButtonType.kTop);
-    double leftScaler = m_speedScaler.speedForMode(leftTrigger, leftTop);
-    double rightScaler = m_speedScaler.speedForMode(rightTrigger, rightTop);
-
-    m_myRobot.tankDrive(leftScaler*m_leftStick.getY(), rightScaler*m_rightStick.getY());
-
+    double leftPower = m_leftStick.getY();
+    double rightPower = m_rightStick.getY();
+    return new DriveSystemInput(leftPower, leftTop, leftTrigger, rightPower, rightTop, rightTrigger);
   }
-  
+  public void writeDriveSystemOutput(DriveSystemOutput output) {
+    m_myRobot.tankDrive(output.leftPower, output.rightPower);
+  }
 }
