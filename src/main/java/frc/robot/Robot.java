@@ -62,6 +62,7 @@ public class Robot extends TimedRobot {
     m_myRobot = new DifferentialDrive(m_leftDrive, m_rightDrive);
     m_mainWinch = new PWMTalonSRX(Config.MAIN_WINCH_PORT);
     m_claw = new Spark(Config.CLAW_PWM_PORT);
+    m_intake = new PWMVictorSPX(Config.INTAKE_PWM_PORT);
     m_backWinch = new PWMTalonSRX(Config.BACK_WINCH_PORT);
     m_leftStick = new Joystick(Config.LEFT_JOYSTICK_PORT);
     m_rightStick = new Joystick(Config.RIGHT_JOYSTICK_PORT);
@@ -78,6 +79,7 @@ public class Robot extends TimedRobot {
     m_mainWinch.setInverted(Config.INVERT_MAIN_WINCH);
     m_claw.setInverted(Config.INVERT_CLAW);
     m_backWinch.setInverted(Config.INVERT_BACK_WINCH);
+    m_intake.setInverted(Config.INVERT_INTAKE);
 
     CameraServer.getInstance().startAutomaticCapture();
   }
@@ -101,6 +103,7 @@ public class Robot extends TimedRobot {
     return new DriveSystemInput(leftPower, leftTop, leftTrigger, rightPower, rightTop, rightTrigger);
   }
   public void writeDriveSystemOutput(DriveSystemOutput output) {
+    System.out.printf("Setting drive power to left %f right %f%n", output.leftPower, output.rightPower);
     m_myRobot.tankDrive(output.leftPower, output.rightPower);
   }
   public ElevatorSystemInput readElevatorSystemInput() {
@@ -110,15 +113,18 @@ public class Robot extends TimedRobot {
     return new ElevatorSystemInput(mainWinchPower, backWinchUp, backWinchDown);
   }
   public void writeElevatorSystemOutput(ElevatorSystemOutput output) {
+    System.out.printf("Setting winch power to main %f back %f%n", output.mainPower, output.backPower);
     m_mainWinch.set(output.mainPower);
     m_backWinch.set(output.backPower);
   }
   public GrabberSystemInput readGrabberSystemInput () {
+    boolean clawOpen = m_controller.getRawButton(Config.CLAW_OPEN_BUTTON_ID);
+    boolean clawClose = m_controller.getRawButton(Config.CLAW_CLOSE_BUTTON_ID); 
     double intakePower = m_controller.getRawAxis(Config.INTAKE_AXIS_ID);
-    boolean clawOpen = m_controller.getRawButton(Config.CLAW_BUTTON_ID);
-    return new GrabberSystemInput(clawOpen, intakePower);
+    return new GrabberSystemInput(clawOpen, clawClose, intakePower);
   }
   public void writeGrabberSystemOutput (GrabberSystemOutput output) {
+    System.out.printf("Setting grabber power to intake %f claw %f%n", output.intakePower, output.clawPower);
     m_intake.set(output.intakePower);
     m_claw.set(output.clawPower);
   }

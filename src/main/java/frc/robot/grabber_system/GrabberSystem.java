@@ -14,8 +14,10 @@ public class GrabberSystem {
 
         if(input.clawOpen) {
             clawPower = m_clawScaler;
-        } else {
+        } else if (input.clawClose){
             clawPower = -m_clawScaler;
+        } else {
+            clawPower = 0;
         }
         return new GrabberSystemOutput(clawPower, intakePower);
     }
