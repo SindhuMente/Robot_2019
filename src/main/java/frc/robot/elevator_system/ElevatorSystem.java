@@ -18,6 +18,14 @@ public class ElevatorSystem {
         } else {
             backPower = 0;
         }
+
+        if (input.forwardLimit) {
+            mainPower = Math.min(0, mainPower);
+        }
+        if (input.reverseLimit) { 
+            mainPower = Math.max(0, mainPower);
+        }
+
         return new ElevatorSystemOutput(mainPower, backPower);
     }
 }

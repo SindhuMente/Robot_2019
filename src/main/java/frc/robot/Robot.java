@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.PWMVictorSPX;
@@ -46,6 +47,8 @@ public class Robot extends TimedRobot {
   private Joystick m_leftStick;
   private Joystick m_rightStick;
   private Joystick m_controller;
+  private DigitalInput m_mainWinchUpperLimit;
+  private DigitalInput m_mainWinchLowerLimit;
   private SpeedScaler m_speedScaler;
   private DriveSystem m_driveSystem;
   private ElevatorSystem m_elevatorSystem;
@@ -64,12 +67,16 @@ public class Robot extends TimedRobot {
     m_claw = new Spark(Config.CLAW_PWM_PORT);
     m_intake = new PWMVictorSPX(Config.INTAKE_PWM_PORT);
     m_backWinch = new PWMTalonSRX(Config.BACK_WINCH_PORT);
+
+    m_mainWinchUpperLimit = new DigitalInput(Config.MAIN_WINCH_UPPER_LIMIT_DIO_PORT);
+    m_mainWinchLowerLimit = new DigitalInput(Config.MAIN_WINCH_LOWER_LIMIT_DIO_PORT);
+
     m_leftStick = new Joystick(Config.LEFT_JOYSTICK_PORT);
     m_rightStick = new Joystick(Config.RIGHT_JOYSTICK_PORT);
     m_controller = new Joystick(Config.CONTROLLER_JOYSTICK_PORT);
     m_speedScaler = new SpeedScaler(Config.SLOW_SPEED, Config.NORMAL_SPEED, Config.TURBO_SPEED);
     m_driveSystem = new DriveSystem(m_speedScaler);
-    m_elevatorSystem = new ElevatorSystem(Config.MAIN_WENCH_SCALE, Config.BACK_WENCH_SCALE);
+    m_elevatorSystem = new ElevatorSystem(Config.MAIN_WINCH_SCALE, Config.BACK_WINCH_SCALE);
     m_grabberSystem = new GrabberSystem(Config.INTAKE_SCALE, Config.CLAW_SCALE);
 
     m_frontLeftDrive.setInverted(Config.INVERT_FRONT_LEFT);
@@ -107,10 +114,16 @@ public class Robot extends TimedRobot {
     m_myRobot.tankDrive(output.leftPower, output.rightPower);
   }
   public ElevatorSystemInput readElevatorSystemInput() {
-    double mainWinchPower = m_controller.getRawAxis(Config.MAIN_WENCH_AXIS_ID);
-    boolean backWinchUp = m_controller.getRawButton(Config.BACK_WENCH_UP_BUTTON_ID);
-    boolean backWinchDown = m_controller.getRawButton(Config.BACK_WENCH_DOWN_BUTTON_ID);
-    return new ElevatorSystemInput(mainWinchPower, backWinchUp, backWinchDown);
+    double mainWinchPower = m_controller.getRawAxis(Config.MAIN_WINCH_AXIS_ID);
+    boolean backWinchUp = m_controller.getRawButton(Config.BACK_WINCH_UP_BUTTON_ID);
+    boolean backWinchDown = m_controller.getRawButton(Config.BACK_WINCH_DOWN_BUTTON_ID);
+    boolean upperLimit = Config.INVERT_MAIN_WINCH_UPPER_LIMIT ^ m_mainWinchUpperLimit.get();
+    boolean lowerLimit = Config.INVERT_MAIN_WINCH_LOWER_LIMIT ^ m_mainWinchLowerLimit.get();
+    boolean forwardLimit = Config.MAIN_WINCH_FORWARD_UP ? upperLimit : lowerLimit;
+    boolean reverseLimit = Config.MAIN_WINCH_FORWARD_UP ? lowerLimit : upperLimit;
+
+
+    return new ElevatorSystemInput(mainWinchPower, backWinchUp, backWinchDown, forwardLimit, reverseLimit);
   }
   public void writeElevatorSystemOutput(ElevatorSystemOutput output) {
     System.out.printf("Setting winch power to main %f back %f%n", output.mainPower, output.backPower);
