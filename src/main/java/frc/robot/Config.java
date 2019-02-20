@@ -45,7 +45,7 @@ public class Config {
     public static final boolean MAIN_WINCH_FORWARD_UP = true;
     public static final int MAIN_WINCH_PORT = 8;
     public static final boolean INVERT_MAIN_WINCH = false;
-    public static final double MAIN_WINCH_SCALE = 0.25;
+    public static final double MAIN_WINCH_SCALE = 1;
 
     //          Back winch
 
