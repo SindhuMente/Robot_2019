@@ -88,7 +88,8 @@ public class Robot extends TimedRobot {
     m_backWinch.setInverted(Config.INVERT_BACK_WINCH);
     m_intake.setInverted(Config.INVERT_INTAKE);
 
-    CameraServer.getInstance().startAutomaticCapture();
+    CameraServer.getInstance().startAutomaticCapture(0);
+    CameraServer.getInstance().startAutomaticCapture(1);
   }
 
   @Override

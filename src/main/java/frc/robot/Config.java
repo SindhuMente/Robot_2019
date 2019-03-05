@@ -43,7 +43,7 @@ public class Config {
     public static final int MAIN_WINCH_LOWER_LIMIT_DIO_PORT = 1;
     public static final boolean INVERT_MAIN_WINCH_LOWER_LIMIT = true;
     public static final boolean MAIN_WINCH_FORWARD_UP = true;
-    public static final int MAIN_WINCH_PORT = 8;
+    public static final int MAIN_WINCH_PORT = 9;
     public static final boolean INVERT_MAIN_WINCH = false;
     public static final double MAIN_WINCH_SCALE = 1;
 
@@ -51,7 +51,7 @@ public class Config {
 
     public static final int BACK_WINCH_UP_BUTTON_ID = 5;
     public static final int BACK_WINCH_DOWN_BUTTON_ID = 7;
-    public static final int BACK_WINCH_PORT = 9;
+    public static final int BACK_WINCH_PORT = 8;
     public static final boolean INVERT_BACK_WINCH = false;
     public static final double BACK_WINCH_SCALE = 1;
 
@@ -70,6 +70,6 @@ public class Config {
     public static final int INTAKE_AXIS_ID = 3;
     public static final int INTAKE_PWM_PORT = 5;
     public static final boolean INVERT_INTAKE = true;
-    public static final double INTAKE_SCALE = 0.5;
+    public static final double INTAKE_SCALE = 1;
 
 }
